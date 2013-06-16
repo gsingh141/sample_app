@@ -43,5 +43,77 @@ describe "User pages" do
                 expect { click_button submit }.to change(User, :count).by(1)
             end
         end
+        
+        describe "after saving the user" do
+            before do
+                fill_in "Name",         with: "Example User"
+                fill_in "Email",        with: "user@example.com"
+                fill_in "Password",     with: "foobar"
+                fill_in "Confirmation", with: "foobar"
+                click_button submit
+            end
+            
+            let(:user) { User.find_by_email('user@example.com') }
+            
+            it { should have_selector('title', text: user.name) }
+            it { should have_selector('div.alert.alert-success', text: 'Welcome') }
+        end
+        
+        describe "after submission" do
+            before { click_button submit }
+            
+            it { should have_selector('title', text: 'Sign up') }
+            it { should have_content('error') }
+        end
+
+        describe "with too short password" do
+            before do
+                fill_in "Name",         with: "Example User"
+                fill_in "Email",        with: "user@example.com"
+                fill_in "Password",     with: ""
+                fill_in "Confirmation", with: ""
+                click_button submit
+            end
+
+            it { should have_content('Password is too short') }
+        end
+        
+        describe "with blank name" do
+            before do
+                fill_in "Name",         with: ""
+                fill_in "Email",        with: "user@example.com"
+                fill_in "Password",     with: "foobar"
+                fill_in "Confirmation", with: "foobar"
+                click_button submit
+            end
+            
+            it { should have_content('Name can\'t be blank') }
+        end
+        
+        describe "with invalid email" do
+            before do
+                fill_in "Name",         with: "Gayatri Singh"
+                fill_in "Email",        with: "user@example"
+                fill_in "Password",     with: "foobar"
+                fill_in "Confirmation", with: "foobar"
+                click_button submit
+            end
+            
+            it { should have_content('Email is invalid') }
+        end
+        
+        describe "with invalid email" do
+            before do
+                fill_in "Name",         with: ""
+                fill_in "Email",        with: "user@example"
+                fill_in "Password",     with: "foobar"
+                fill_in "Confirmation", with: "foobar"
+                click_button submit
+            end
+            
+            it { should have_content('Email is invalid') }
+            it { should have_content('Name can\'t be blank') }
+        end
+        
     end
 end
