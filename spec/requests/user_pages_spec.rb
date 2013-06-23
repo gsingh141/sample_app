@@ -86,6 +86,29 @@ end
         it { should have_content('Invalid email/password combination') }
     end
     
+    describe "profile page" do
+        let(:user) { FactoryGirl.create(:user, email: "example@railstutorial.org") }
+        let!(:m1) { FactoryGirl.create(:micropost, user: user, content: "Foo") }
+        let!(:m2) { FactoryGirl.create(:micropost, user: user, content: "Bar") }
+        
+        before do
+            visit user_path(user)
+            fill_in "Email",            with: user.email
+            fill_in "Password",         with: user.password
+            click_button "Sign in"
+        end
+        
+        it { should have_selector('h1',    text: user.name) }
+        it { should have_selector('title', text: user.name) }
+        
+        describe "microposts" do
+            it { should have_content(m1.content) }
+            it { should have_content(m2.content) }
+            it { should have_content(user.microposts.count) }
+        end
+    end
+        
+        
     describe "signup" do
         
         before { visit signup_path }
